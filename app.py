@@ -1,11 +1,6 @@
 import streamlit as st
 import pandas as pd
 import pydeck as pdk
-import matplotlib.pyplot as plt
-import numpy as np
-
-# Set up the Streamlit app
-st.title('World Population Map')
 
 # Corrected population data with potential comma issues fixed
 data = """
@@ -234,7 +229,7 @@ Monaco,38367
 "Åland (Finland)",30547
 Palau,16733
 "Anguilla (UK)",15701
-"Cook Islands",15040
+Cook Islands,15040
 Nauru,11680
 "Wallis and Futuna (France)",11369
 Tuvalu,10679
@@ -252,19 +247,43 @@ Niue,1689
 "Pitcairn Islands (UK)",47
 """
 
-# Map settings (you can add your map visualization code here)
-# Create some data for plotting
-x = np.linspace(0, 10, 100)
-y = np.sin(x)
+# Convert the data to a DataFrame
+df = pd.read_csv(io.StringIO(data))
 
-# Create a Matplotlib figure
-fig, ax = plt.subplots()
-ax.plot(x, y)
-ax.set_xlabel('X-axis')
-ax.set_ylabel('Y-axis')
-ax.set_title('Sine Wave')
+# Set up the Streamlit app
+st.title('World Population Map')
 
-# Display the figure using st.pyplot()
-st.pyplot(fig)
+# Map settings
+map_data = df.rename(columns={'Country': 'name', 'Population': 'size'})
+map_data['size'] = map_data['size'] / 1e6  # Scale down the population for better visualization
+
+view_state = pdk.ViewState(
+    latitude=0,
+    longitude=0,
+    zoom=1,
+    pitch=0
+)
+
+# Render the PyDeck map
+layer = pdk.Layer(
+    'ScatterplotLayer',
+    data=map_data,
+    get_position='[0, 0]',
+    get_radius=50000,
+    get_fill_color='[255, 0, 0]',
+    pickable=True,
+    auto_highlight=True
+)
+
+# Create the deck
+deck = pdk.Deck(
+    map_style='mapbox://styles/mapbox/light-v9',
+    initial_view_state=view_state,
+    layers=[layer],
+    tooltip={"text": "{name}: {size} million"}
+)
+
+# Render the PyDeck map with Streamlit
+st.pydeck_chart(deck)
 
 
