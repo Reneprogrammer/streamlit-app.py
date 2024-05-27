@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import pydeck as pdk
+import io
 
 # Corrected population data with potential comma issues fixed
 data = """
