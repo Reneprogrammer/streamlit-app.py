@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import pydeck as pdk
-import io
 
 # Corrected population data with potential comma issues fixed
 data = """
@@ -197,7 +196,7 @@ Samoa,205557
 "Guam (US)",153836
 "Curacao (Netherlands)",148925
 Kiribati,120740
-Grenada,112579
+Grenada120740
 "Saint Vincent and the Grenadines",110872
 "Aruba (Netherlands)",106739
 Micronesia,105754
@@ -267,11 +266,12 @@ view_state = pdk.ViewState(
 
 # Render the PyDeck map
 layer = pdk.Layer(
-    'ScatterplotLayer',
-    data=map_data,
-    get_position='[0, 0]',
-    get_radius=50000,
-    get_fill_color='[255, 0, 0]',
+    'GeoJsonLayer',
+    data='https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json',
+    get_fill_color='[255, 255 * (1 - size / 1400), 255 * (1 - size / 1400)]',  # Color based on population size
+    filled=True,
+    extruded=True,  # Enable 3D extrusion
+    wireframe=True,
     pickable=True,
     auto_highlight=True
 )
@@ -286,5 +286,7 @@ deck = pdk.Deck(
 
 # Render the PyDeck map with Streamlit
 st.pydeck_chart(deck)
+
+
 
 
